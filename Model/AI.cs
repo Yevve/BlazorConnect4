@@ -2,6 +2,7 @@
 using System.IO;
 using BlazorConnect4.Model;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace BlazorConnect4.AIModels
 {
@@ -59,6 +60,50 @@ namespace BlazorConnect4.AIModels
             // Eftersom generatorn inte var serialiserad.
             temp.generator = new Random();
             return temp;
+        }
+    }
+
+    [Serializable]
+    public class QAgent : AI
+    {
+        [NonSerialized] Random generator;
+
+        //Piska eller morot
+        public float goodBoy = 1;
+        public float badBoy = -1;
+        public float invalidMove = -0.1F;
+        public float AIScore = 0F;
+        public float numIOfRuns = 0;
+        private CellColor playerColor;
+
+        Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
+        
+        public QAgent(CellColor playerColor)
+        {
+            this.playerColor = playerColor;
+
+        }
+        public static QAgent ConstructFromFile(string fileName)
+        {
+            QAgent temp = (QAgent)(AI.FromFile(fileName));
+            return temp;
+        }
+
+        public override int SelectMove(Cell[,] grid)
+        {
+            /*if (GameEngine.IsWin(col, row))
+            {
+                
+            }*/
+           
+            if (newGameEngine.IsWin(col, row)
+            
+        }
+
+        public bool isValid(int col, Cell[,] grid)
+        {
+            bool isValid = grid[col, 0].Color == CellColor.Blank;
+            return isValid;
         }
     }
 }

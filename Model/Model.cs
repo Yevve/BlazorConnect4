@@ -89,15 +89,27 @@ namespace BlazorConnect4.Model
             }
             else if (playAgainst == "Q1")
             {
-                ai = new RandomAI();
+                if (File.Exists("Data/Q1.bin"))
+                {
+                    ai = QAgent.ConstructFromFile("Data/Q1.bin");
+                }
+                else
+                {
+                    ai = new QAgent(Player);
+                    ai.ToFile("Data/Q1.bin");
+                }
+
+               
             }
             else if (playAgainst == "Q2")
             {
                 ai = new RandomAI();
+                ai.ToFile("Data/Q2.bin");
             }
             else if (playAgainst == "Q3")
             {
                 ai = new RandomAI();
+                ai.ToFile("Data/Q3.bin");
             }
 
         }
@@ -138,6 +150,7 @@ namespace BlazorConnect4.Model
                     if (Board.Grid[col,i].Color == Player)
                     {
                         score++;
+                      
                     }
                 }
                 win = score == 4;
@@ -271,5 +284,119 @@ namespace BlazorConnect4.Model
         }
     }
 
+    public class newGameEngine
+    {
+        public GameBoard Board { get; set; }
+        public CellColor Player { get; set; }
 
-}
+        public newGameEngine()
+        {
+            Board = new GameBoard();
+            Player = CellColor.Red;
+        }
+        public static bool IsValid(Cell[,] board,int col)
+        {
+            return board[col, 0].Color == CellColor.Blank;
+        }
+
+
+        public bool IsDraw()
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                if (Board.Grid[i, 0].Color == CellColor.Blank)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        public bool IsWin(int col, int row)
+        {
+            bool win = false;
+            int score = 0;
+
+
+            // Check down
+            if (row < 3)
+            {
+                for (int i = row; i <= row + 3; i++)
+                {
+                    if (Board.Grid[col, i].Color == Player)
+                    {
+                        score++;
+
+                    }
+                }
+                win = score == 4;
+                score = 0;
+            }
+
+            // Check horizontal
+
+            int left = Math.Max(col - 3, 0);
+
+            for (int i = left; i <= col; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    if (i + j <= 6 && Board.Grid[i + j, row].Color == Player)
+                    {
+                        score++;
+                    }
+                }
+                win = win || score == 4;
+                score = 0;
+            }
+
+            // Check left down diagonal
+
+            int colpos;
+            int rowpos;
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    colpos = col - i + j;
+                    rowpos = row - i + j;
+                    if (0 <= colpos && colpos <= 6 &&
+                        0 <= rowpos && rowpos < 6 &&
+                        Board.Grid[colpos, rowpos].Color == Player)
+                    {
+                        score++;
+                    }
+                }
+
+                win = win || score == 4;
+                score = 0;
+            }
+
+            // Check left up diagonal
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    colpos = col + i - j;
+                    rowpos = row - i + j;
+                    if (0 <= colpos && colpos <= 6 &&
+                        0 <= rowpos && rowpos < 6 &&
+                        Board.Grid[colpos, rowpos].Color == Player)
+                    {
+                        score++;
+                    }
+                }
+
+                win = win || score == 4;
+                score = 0;
+            }
+
+            return win;
+        }
+
+    }
+
+    }
