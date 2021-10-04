@@ -19,7 +19,8 @@ namespace BlazorConnect4
             {
                 Directory.CreateDirectory("./Data");
             }
-            CreateHostBuilder(args).Build().Run();
+            BigBrainBootCamp();
+            //CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -28,5 +29,34 @@ namespace BlazorConnect4
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        private static void BigBrainBootCamp()
+        {
+            Console.WriteLine("Let's get working!");
+            AIModels.QAgent red;
+            AIModels.QAgent yellow;
+
+            if (!File.Exists("Data/RedQ1.bin"))
+            {
+                red = new AIModels.QAgent(Model.CellColor.Red);
+                red.ToFile("Data/RedQ1.bin");
+            }
+            else
+            {
+                red = AIModels.QAgent.ConstructFromFile("Data/RedQ1.bin");
+            }
+            if (!File.Exists("Data/YellowQ1.bin"))
+            {
+                yellow = new AIModels.QAgent(Model.CellColor.Yellow);
+                yellow.ToFile("Data/YellowQ1.bin");
+            }
+            else
+            {
+                yellow = AIModels.QAgent.ConstructFromFile("Data/YellowQ1.bin");
+            }
+            red.brainTrainingCamp(yellow, iterations: 1000);
+            
+            red.ToFile("Data/RedQ1");
+        }
     }
 }

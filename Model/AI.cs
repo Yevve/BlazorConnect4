@@ -163,53 +163,61 @@ namespace BlazorConnect4.AIModels
         }
        public void brainTrainingCamp(QAgent agent, int iterations)
         {
-            newGameEngine brainTrainingEngine = new newGameEngine();
-            Cell[,] grid = brainTrainingEngine.Board.Grid;
-
-            CellColor player = brainTrainingEngine.Player;
-            CellColor opponentAgent = agent.playerColor;
-            CellColor playerTurn = CellColor.Red;
-
-            int move = 0;
-            int previousMove = move;
-
-            if (playerTurn == player)
+            for (int i = 0; i < iterations; i += 1)
             {
-                move = SelectMove(grid);
-                previousMove = move;
-            }
-            else
-            {
-                move = agent.SelectMove(grid);
-            }
-            if (!brainTrainingEngine.IsValid(grid, move))
-            {
-                if(playerTurn == player)
+                newGameEngine brainTrainingEngine = new newGameEngine();
+                Cell[,] grid = brainTrainingEngine.Board.Grid;
+
+                CellColor player = brainTrainingEngine.Player;
+                CellColor opponentAgent = agent.playerColor;
+                CellColor playerTurn = CellColor.Red;
+
+                int move = 0;
+                int previousMove = move;
+
+                if (playerTurn == player)
                 {
-                    //Invalid move
-                    updateBrain(grid, move, invalidMove);
+                    move = SelectMove(grid);
+                    previousMove = move;
                 }
-                
-            }
-            brainTrainingEngine.Play(move, playerTurn);
+                else
+                {
+                    move = agent.SelectMove(grid);
+                }
+                if (!brainTrainingEngine.IsValid(grid, move))
+                {
+                    if (playerTurn == player)
+                    {
+                        //Invalid move
+                        updateBrain(grid, move, invalidMove);
+                        continue;
+                    }
 
-            if (brainTrainingEngine.IsWin(move, playerTurn))
-            {
-                //Knowledge ++
-                updateBrain(grid, move, goodBoy);
+                }
+                brainTrainingEngine.Play(move, playerTurn);
+
+                if (brainTrainingEngine.IsWin(move, playerTurn))
+                {
+                    //Knowledge ++
+                    Console.WriteLine("Win");
+                    updateBrain(grid, move, goodBoy);
+                    break;
+                }
+                else
+                {
+                    //Knowledge --
+                    Console.WriteLine("Lost");
+                    updateBrain(grid, move, badBoy);
+                }
+                if (brainTrainingEngine.IsDraw())
+                {
+                    //small reward for atleaset trying :)
+                    updateBrain(grid, move, mediocreMove);
+                    Console.WriteLine("Draw");
+                    break;
+                }
+                Console.WriteLine("Studies complete");
             }
-            else
-            {
-                //Knowledge --
-                updateBrain(grid, move, badBoy);
-            }
-            if (brainTrainingEngine.IsDraw())
-            {
-                //small reward for atleaset trying :)
-                updateBrain(grid, move, mediocreMove);
-                Console.WriteLine("Draw");
-            }
-            
         }
     }
 }
