@@ -77,7 +77,7 @@ namespace BlazorConnect4.AIModels
         private CellColor playerColor;
         
 
-        Dictionary<String, float[]> brainDict = new Dictionary<string, float[]>();
+        Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
         
         public QAgent(CellColor playerColor)
         {
@@ -133,25 +133,27 @@ namespace BlazorConnect4.AIModels
             }
             
         }
-        // go through the meamory and search for the right column to put down the piece 
+        // go through the meamory and search for the right column to put down the piece. Seems like it is not going in here. Maybe needs rewards to make it work.
         public double searchInBrain(Cell[,] grid, int column)
         {
             Random random = new Random();
-            float[] randomMove ={};
+            
             String gridString = GameBoard.GridToString(grid);
             if (!brainDict.ContainsKey(gridString)){
-                for(int i = 0;i < 7; i++)
-                {
-                    // get outside the index of array 
-                    randomMove[i] += random.Next(7);
-                }
+
+                double[] randomMove ={random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble()};
                 brainDict.Add(gridString, randomMove);
                 return randomMove[0];
-                Console.WriteLine(randomMove);
+                Console.WriteLine(randomMove);// does not print shit 
             }
 
             return brainDict[gridString][column];
         }
-        
+       public void brainTrainingCamp(QAgent agent, int iterations)
+        {
+            newGameEngine brainTrainingEngine = new newGameEngine();
+
+
+        }
     }
 }
