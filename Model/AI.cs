@@ -135,7 +135,7 @@ namespace BlazorConnect4.AIModels
                 int currentMove = randomValue.Next(7);
                 while(!newGameEngine.IsValid(grid, currentMove))
                 {
-                    // repeat random move is outside the grid.
+                    // repeat random move so it is not outside the grid.
                     currentMove = randomValue.Next(7);
                 }
                 return currentMove;
