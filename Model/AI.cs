@@ -36,7 +36,7 @@ namespace BlazorConnect4.AIModels
         }
 
     }
-    
+
 
 
     [Serializable]
@@ -75,9 +75,11 @@ namespace BlazorConnect4.AIModels
         public float mediocreMove = 0.1F;
         public float AIScore = 0F;
         private int numberOfReps = 0;
+        public int wins;
+        public int losses;
 
         Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
-        
+
         public QAgent(CellColor playerColor)
         {
             this.playerColor = playerColor;
@@ -89,7 +91,7 @@ namespace BlazorConnect4.AIModels
             return temp;
         }
 
-        
+
         /**
          * PARAM: Cell[,] grid
          * RETURN:int action
@@ -130,17 +132,18 @@ namespace BlazorConnect4.AIModels
                 }
                 return column;
             }
-            
+
         }
         // go through the meamory and search for the right column to put down the piece. Seems like it is not going in here. Maybe needs rewards to make it work.
         public double searchInBrain(Cell[,] grid, int column)
         {
             Random random = new Random();
-            
-            String gridString = GameBoard.GridToString(grid);
-            if (!brainDict.ContainsKey(gridString)){
 
-                double[] randomMove ={random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble(),random.NextDouble()};
+            String gridString = GameBoard.GridToString(grid);
+            if (!brainDict.ContainsKey(gridString))
+            {
+
+                double[] randomMove = { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() };
                 brainDict.Add(gridString, randomMove);
                 return randomMove[0];
                 Console.WriteLine(randomMove);// does not print shit 
@@ -161,19 +164,20 @@ namespace BlazorConnect4.AIModels
             }
             brainDict[gridString][column] = reward;
         }
-       public void brainTrainingCamp(QAgent agent, int iterations)
+        public void brainTrainingCamp(QAgent agent, int iterations)
         {
+            newGameEngine brainTrainingEngine = new newGameEngine();
             for (int i = 0; i < iterations; i += 1)
             {
-                newGameEngine brainTrainingEngine = new newGameEngine();
+                brainTrainingEngine.Reset();
+
                 Cell[,] grid = brainTrainingEngine.Board.Grid;
 
                 CellColor player = brainTrainingEngine.Player;
-                CellColor opponentAgent = agent.playerColor;
                 CellColor playerTurn = CellColor.Red;
 
-                int move = 0;
-                int previousMove = move;
+                int move;
+                int previousMove;
 
                 if (playerTurn == player)
                 {
@@ -201,23 +205,25 @@ namespace BlazorConnect4.AIModels
                     //Knowledge ++
                     Console.WriteLine("Win");
                     updateBrain(grid, move, goodBoy);
-                    break;
+                    wins += 1;
+                }
+                else if (brainTrainingEngine.IsDraw())
+                {
+                    //small reward for atleaset trying :)
+                    updateBrain(grid, move, mediocreMove);
+                    Console.WriteLine("Draw");
                 }
                 else
                 {
                     //Knowledge --
                     Console.WriteLine("Lost");
                     updateBrain(grid, move, badBoy);
+                    losses += 1;
                 }
-                if (brainTrainingEngine.IsDraw())
-                {
-                    //small reward for atleaset trying :)
-                    updateBrain(grid, move, mediocreMove);
-                    Console.WriteLine("Draw");
-                    break;
-                }
-                Console.WriteLine("Studies complete");
+
             }
+            Console.WriteLine("Studies complete");
+            Console.Write("Wins: " + wins + ", Losses: " + losses);
         }
     }
 }

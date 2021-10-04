@@ -54,9 +54,9 @@ namespace BlazorConnect4
             {
                 yellow = AIModels.QAgent.ConstructFromFile("Data/YellowQ1.bin");
             }
-            red.brainTrainingCamp(yellow, iterations: 1000);
-            
-            red.ToFile("Data/RedQ1");
+            red.brainTrainingCamp(yellow, iterations: 100000);
+
+            red.ToFile("Data/RedQ1.bin");
         }
     }
 }

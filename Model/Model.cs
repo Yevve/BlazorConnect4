@@ -14,7 +14,7 @@ namespace BlazorConnect4.Model
 
     public class Cell
     {
-        public CellColor Color {get; set;}
+        public CellColor Color { get; set; }
 
         public Cell(CellColor color)
         {
@@ -59,7 +59,7 @@ namespace BlazorConnect4.Model
     public class GameEngine
     {
         public GameBoard Board { get; set; }
-        public CellColor Player { get; set;}
+        public CellColor Player { get; set; }
         public bool active;
         public String message;
         private AI ai;
@@ -96,7 +96,7 @@ namespace BlazorConnect4.Model
                     ai = new RandomAI();
                     ai.ToFile("Data/Random.bin");
                 }
-                
+
             }
             else if (playAgainst == "Q1")
             {
@@ -110,7 +110,7 @@ namespace BlazorConnect4.Model
                     ai.ToFile("Data/Q1.bin");
                 }
 
-               
+
             }
             else if (playAgainst == "Q2")
             {
@@ -155,7 +155,7 @@ namespace BlazorConnect4.Model
         {
             for (int i = 0; i < 7; i++)
             {
-                if (Board.Grid[i,0].Color == CellColor.Blank)
+                if (Board.Grid[i, 0].Color == CellColor.Blank)
                 {
                     return false;
                 }
@@ -168,17 +168,17 @@ namespace BlazorConnect4.Model
         {
             bool win = false;
             int score = 0;
-            
+
 
             // Check down
             if (row < 3)
             {
                 for (int i = row; i <= row + 3; i++)
                 {
-                    if (Board.Grid[col,i].Color == Player)
+                    if (Board.Grid[col, i].Color == Player)
                     {
                         score++;
-                      
+
                     }
                 }
                 win = score == 4;
@@ -193,7 +193,7 @@ namespace BlazorConnect4.Model
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (i+j <= 6 && Board.Grid[i+j,row].Color == Player)
+                    if (i + j <= 6 && Board.Grid[i + j, row].Color == Player)
                     {
                         score++;
                     }
@@ -215,7 +215,7 @@ namespace BlazorConnect4.Model
                     rowpos = row - i + j;
                     if (0 <= colpos && colpos <= 6 &&
                         0 <= rowpos && rowpos < 6 &&
-                        Board.Grid[colpos,rowpos].Color == Player)
+                        Board.Grid[colpos, rowpos].Color == Player)
                     {
                         score++;
                     }
@@ -240,7 +240,7 @@ namespace BlazorConnect4.Model
                         score++;
                     }
                 }
-                
+
                 win = win || score == 4;
                 score = 0;
             }
@@ -253,7 +253,8 @@ namespace BlazorConnect4.Model
 
         public bool Play(int col)
         {
-            if (IsValid(col) && active){
+            if (IsValid(col) && active)
+            {
 
                 for (int i = 5; i >= 0; i--)
                 {
@@ -261,7 +262,7 @@ namespace BlazorConnect4.Model
                     {
                         Board.Grid[col, i].Color = Player;
 
-                        if (IsWin(col,i))
+                        if (IsWin(col, i))
                         {
                             message = Player.ToString() + " Wins";
                             active = false;
@@ -300,7 +301,7 @@ namespace BlazorConnect4.Model
             {
                 int move = ai.SelectMove(Board.Grid);
 
-                while (! IsValid(move))
+                while (!IsValid(move))
                 {
                     move = ai.SelectMove(Board.Grid);
                 }
@@ -323,7 +324,7 @@ namespace BlazorConnect4.Model
             Player = CellColor.Red;
         }
 
-        public void Play(int col,CellColor playerColor)
+        public void Play(int col, CellColor playerColor)
         {
 
 
@@ -337,7 +338,12 @@ namespace BlazorConnect4.Model
             }
         }
 
-        
+        public void Reset()
+        {
+            Board = new GameBoard();
+            Player = CellColor.Red;
+        }
+
         public bool IsValid(Cell[,] board, int col)
         {
             return board[col, 0].Color == CellColor.Blank;
@@ -438,11 +444,11 @@ namespace BlazorConnect4.Model
                     score = 0;
                 }
 
-                
+
             }
             return win;
         }
 
     }
 
-    }
+}
