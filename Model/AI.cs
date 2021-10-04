@@ -75,6 +75,7 @@ namespace BlazorConnect4.AIModels
         public float AIScore = 0F;
         public float numIOfRuns = 0;
         private CellColor playerColor;
+        private int numberOfReps = 0;
 
         Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
         
@@ -91,13 +92,34 @@ namespace BlazorConnect4.AIModels
 
         public override int SelectMove(Cell[,] grid)
         {
-            /*if (GameEngine.IsWin(col, row))
+            float epsilon = 0.85F;
+
+            int move =  epsilionEvaluation(grid,epsilon);
+
+            return move;
+
+        }
+        public int epsilionEvaluation(Cell[,] grid,float epsilon)
+        {
+            Random randomValue = new Random();
+
+            if (randomValue.NextDouble() < epsilon)
             {
-                
-            }*/
-           
-            if (newGameEngine.IsWin(col, row)
-            
+                // make a random move.
+                int currentMove = randomValue.Next(7);
+                while(!newGameEngine.IsValid(grid, currentMove))
+                {
+                    // repeat random move is outside the grid.
+                    currentMove = randomValue.Next(7);
+                }
+                return currentMove;
+            }
+            else
+            {
+                // search in brainDict for old moves that were best in this grid varient.
+            }
+
+            return 0;
         }
 
         public bool isValid(int col, Cell[,] grid)
