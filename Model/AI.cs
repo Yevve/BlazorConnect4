@@ -100,6 +100,13 @@ namespace BlazorConnect4.AIModels
 
         }*/
 
+
+        /**
+         * PARAM: Cell[,] grid
+         * RETURN:int action
+         * 
+         * Takes in a position on the board and returns a valid move.
+         */
         public override int SelectMove(Cell[,] grid)
         {
             double epsilon = 0.85F;
@@ -110,6 +117,7 @@ namespace BlazorConnect4.AIModels
 
             bool validMove = newGameEngine.IsValid(grid, action);
 
+            //While there are no valid moves, make a random move and validate it
             while (!validMove)
             {
                 action = randomAction;
@@ -119,12 +127,13 @@ namespace BlazorConnect4.AIModels
             return action;
         }
 
-        //alpha = learning rate, gamma = discount factor, epsilon = small number
-        /*public int epsilonGreedy(int alpha, int gamma, int epsilon)
-        {
-
-        }*/
-
+        /**
+         * PARAM: Cell[,] grid, double epsilon
+         * RETURN: int currentMove
+         * 
+         * Function to evaluate epsilon to make a decision if the AI should make
+         * a random move or a calculated one.
+         */
         public int epsilionEvaluation(Cell[,] grid, double epsilon)
         {
             Random randomValue = new Random();
