@@ -40,7 +40,18 @@ namespace BlazorConnect4.Model
                 }
             }
         }
-
+        public static String GridToString(Cell[,] grid)
+        {
+            System.Text.StringBuilder gridString = new System.Text.StringBuilder();
+            for (int row = 0; row < 6; row++)
+            {
+                for (int col = 0; col < 7; col++)
+                {
+                    gridString.Append(grid[col, row].Color);
+                }
+            }
+            return gridString.ToString();
+        }
 
     }
 
