@@ -90,7 +90,7 @@ namespace BlazorConnect4.AIModels
             return temp;
         }
 
-        public override int SelectMove(Cell[,] grid)
+        /*public override int SelectMove(Cell[,] grid)
         {
             float epsilon = 0.85F;
 
@@ -98,8 +98,34 @@ namespace BlazorConnect4.AIModels
 
             return move;
 
+        }*/
+
+        public override int SelectMove(Cell[,] grid)
+        {
+            double epsilon = 0.85F;
+            //Check if AI should do an epsilon move or a random move
+            Random randomGen = new Random();
+            int randomAction = randomGen.Next(0, 7);
+            int action = epsilionEvaluation(grid, epsilon);
+
+            bool validMove = newGameEngine.IsValid(grid, action);
+
+            while (!validMove)
+            {
+                action = randomAction;
+                validMove = newGameEngine.IsValid(grid, action);
+
+            }
+            return action;
         }
-        public int epsilionEvaluation(Cell[,] grid,float epsilon)
+
+        //alpha = learning rate, gamma = discount factor, epsilon = small number
+        /*public int epsilonGreedy(int alpha, int gamma, int epsilon)
+        {
+
+        }*/
+
+        public int epsilionEvaluation(Cell[,] grid, double epsilon)
         {
             Random randomValue = new Random();
 
