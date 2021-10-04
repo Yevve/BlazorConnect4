@@ -66,16 +66,14 @@ namespace BlazorConnect4.AIModels
     [Serializable]
     public class QAgent : AI
     {
-        [NonSerialized] Random generator;
 
+        private CellColor playerColor;
         //Piska eller morot
         public float goodBoy = 1F;
         public float badBoy = -1F;
         public float invalidMove = -0.1F;
         public float AIScore = 0F;
         private int numberOfReps = 0;
-        private CellColor playerColor;
-        
 
         Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
         
@@ -108,7 +106,7 @@ namespace BlazorConnect4.AIModels
             if (randomGen.NextDouble() < epsilon)
             {
                 int randomAction = randomGen.Next(0, 7);
-                while (!newGameEngine.IsValid(grid, randomAction))
+                while (!GameEngine.IsValid(grid, randomAction))
                 {
                     randomAction = randomGen.Next(0, 7);
                 }
@@ -152,8 +150,52 @@ namespace BlazorConnect4.AIModels
        public void brainTrainingCamp(QAgent agent, int iterations)
         {
             newGameEngine brainTrainingEngine = new newGameEngine();
+            Cell[,] grid = brainTrainingEngine.Board.Grid;
 
+            CellColor player = brainTrainingEngine.Player;
+            CellColor opponentAgent = agent.playerColor;
+            CellColor playerTurn = CellColor.Red;
 
+            int move = 0;
+            int previousMove = move;
+
+            if (playerTurn == player)
+            {
+                move = SelectMove(grid);
+                previousMove = move;
+            }
+            else
+            {
+                move = agent.SelectMove(grid);
+            }
+            if (!brainTrainingEngine.IsValid(grid, move))
+            {
+                if(playerTurn == player)
+                {
+                    //TODO: Update memory
+                }
+                
+            }
+            brainTrainingEngine.Play(move, playerTurn);
+
+            if (brainTrainingEngine.IsWin(move, playerTurn))
+            {
+                //TODO: Update memory
+                //Knowledge ++
+                Console.WriteLine("Win");
+            }
+            else
+            {
+                //TODO: Update memory
+                //Knowledge --
+                Console.WriteLine("Lose");
+            }
+            if (brainTrainingEngine.IsDraw())
+            {
+                //Break
+                Console.WriteLine("Draw");
+            }
+            
         }
     }
 }
