@@ -100,14 +100,14 @@ namespace BlazorConnect4.Model
             }
             else if (playAgainst == "Q1")
             {
-                if (File.Exists("Data/Q1.bin"))
+                if (File.Exists("Data/RedQ1.bin"))
                 {
-                    ai = QAgent.ConstructFromFile("Data/Q1.bin");
+                    ai = QAgent.ConstructFromFile("Data/RedQ1.bin");
                 }
                 else
                 {
                     ai = new QAgent(Player);
-                    ai.ToFile("Data/Q1.bin");
+                    ai.ToFile("Data/RedQ1.bin");
                 }
 
 
@@ -332,7 +332,7 @@ namespace BlazorConnect4.Model
             {
                 if (Board.Grid[col, i].Color == CellColor.Blank)
                 {
-                    Board.Grid[col, i].Color = Player;
+                    Board.Grid[col, i].Color = playerColor;
                     break;
                 }
             }
@@ -343,6 +343,7 @@ namespace BlazorConnect4.Model
             Board = new GameBoard();
             Player = CellColor.Red;
         }
+
 
         public bool IsValid(Cell[,] board, int col)
         {
@@ -367,14 +368,14 @@ namespace BlazorConnect4.Model
             bool win = false;
             int score = 0;
 
-            for (int row = 5; row < 3; row--)
+            for (int row = 5; row >= 0; row--)
             {
                 // Check down
                 if (row < 3)
                 {
                     for (int i = row; i <= row + 3; i++)
                     {
-                        if (Board.Grid[col, i].Color == Player)
+                        if (Board.Grid[col, i].Color == playerColor)
                         {
                             score++;
 
@@ -392,7 +393,7 @@ namespace BlazorConnect4.Model
                 {
                     for (int j = 0; j < 4; j++)
                     {
-                        if (i + j <= 6 && Board.Grid[i + j, row].Color == Player)
+                        if (i + j <= 6 && Board.Grid[i + j, row].Color == playerColor)
                         {
                             score++;
                         }
@@ -414,7 +415,7 @@ namespace BlazorConnect4.Model
                         rowpos = row - i + j;
                         if (0 <= colpos && colpos <= 6 &&
                             0 <= rowpos && rowpos < 6 &&
-                            Board.Grid[colpos, rowpos].Color == Player)
+                            Board.Grid[colpos, rowpos].Color == playerColor)
                         {
                             score++;
                         }
@@ -434,7 +435,7 @@ namespace BlazorConnect4.Model
                         rowpos = row - i + j;
                         if (0 <= colpos && colpos <= 6 &&
                             0 <= rowpos && rowpos < 6 &&
-                            Board.Grid[colpos, rowpos].Color == Player)
+                            Board.Grid[colpos, rowpos].Color == playerColor)
                         {
                             score++;
                         }
@@ -447,6 +448,17 @@ namespace BlazorConnect4.Model
 
             }
             return win;
+        }
+        public CellColor ChangePlayer(CellColor playerColor)
+        {
+            if (playerColor == CellColor.Yellow)
+            {
+                return CellColor.Red;
+            }
+            else
+            {
+                return CellColor.Yellow;
+            }
         }
 
     }

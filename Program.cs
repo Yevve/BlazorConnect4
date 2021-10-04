@@ -19,8 +19,10 @@ namespace BlazorConnect4
             {
                 Directory.CreateDirectory("./Data");
             }
+            
             BigBrainBootCamp();
-            //CreateHostBuilder(args).Build().Run();
+            // kommentera CreateHostBuilder och kör console för att se hur ai's spelar mot varandra
+            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -54,7 +56,7 @@ namespace BlazorConnect4
             {
                 yellow = AIModels.QAgent.ConstructFromFile("Data/YellowQ1.bin");
             }
-            red.brainTrainingCamp(yellow, iterations: 100000);
+            red.brainTrainingCamp(yellow, iterations: 50);
 
             red.ToFile("Data/RedQ1.bin");
         }

@@ -77,6 +77,7 @@ namespace BlazorConnect4.AIModels
         private int numberOfReps = 0;
         public int wins;
         public int losses;
+        public int draws;
 
         Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
 
@@ -100,6 +101,7 @@ namespace BlazorConnect4.AIModels
          */
         public override int SelectMove(Cell[,] grid)
         {
+            //Maybe use a seed?
             double epsilon = 0.85F;
             //Check if AI should do an epsilon move or a random move
             Random randomGen = new Random();
@@ -134,7 +136,7 @@ namespace BlazorConnect4.AIModels
             }
 
         }
-        // go through the meamory and search for the right column to put down the piece. Seems like it is not going in here. Maybe needs rewards to make it work.
+        // go through the brain and search for the right column to put down the piece.
         public double searchInBrain(Cell[,] grid, int column)
         {
             Random random = new Random();
@@ -146,11 +148,11 @@ namespace BlazorConnect4.AIModels
                 double[] randomMove = { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() };
                 brainDict.Add(gridString, randomMove);
                 return randomMove[0];
-                Console.WriteLine(randomMove);// does not print shit 
             }
 
             return brainDict[gridString][column];
         }
+        // add rewards to brain
         public void updateBrain(Cell[,] grid, int column, float reward)
         {
             Random random = new Random();
@@ -172,58 +174,71 @@ namespace BlazorConnect4.AIModels
                 brainTrainingEngine.Reset();
 
                 Cell[,] grid = brainTrainingEngine.Board.Grid;
-
                 CellColor player = brainTrainingEngine.Player;
                 CellColor playerTurn = CellColor.Red;
-
                 int move;
                 int previousMove;
 
-                if (playerTurn == player)
-                {
-                    move = SelectMove(grid);
-                    previousMove = move;
-                }
-                else
-                {
-                    move = agent.SelectMove(grid);
-                }
-                if (!brainTrainingEngine.IsValid(grid, move))
+                while (i < iterations)
                 {
                     if (playerTurn == player)
                     {
-                        //Invalid move
-                        updateBrain(grid, move, invalidMove);
-                        continue;
+                        move = SelectMove(grid);
+                        previousMove = move;
                     }
+                    else
+                    {
+                        //Oppnent makes a move
+                        move = agent.SelectMove(grid);
+                    }
+                    if (!brainTrainingEngine.IsValid(grid, move))
+                    {
+                        if (playerTurn == player)
+                        {
+                            //Invalid move
+                            updateBrain(grid, move, invalidMove);
+                            continue;
+                        }
 
-                }
-                brainTrainingEngine.Play(move, playerTurn);
+                    }
+                    brainTrainingEngine.Play(move, playerTurn);
 
-                if (brainTrainingEngine.IsWin(move, playerTurn))
-                {
-                    //Knowledge ++
-                    Console.WriteLine("Win");
-                    updateBrain(grid, move, goodBoy);
-                    wins += 1;
-                }
-                else if (brainTrainingEngine.IsDraw())
-                {
-                    //small reward for atleaset trying :)
-                    updateBrain(grid, move, mediocreMove);
-                    Console.WriteLine("Draw");
-                }
-                else
-                {
-                    //Knowledge --
-                    Console.WriteLine("Lost");
-                    updateBrain(grid, move, badBoy);
-                    losses += 1;
+                    if (brainTrainingEngine.IsWin(move, playerTurn))
+                    {
+                        if (playerTurn == player)
+                        {
+                            //Knowledge ++
+                            Console.WriteLine("Win");
+                            updateBrain(grid, move, goodBoy);
+                            wins += 1;
+                            break;
+                        }
+                        else
+                        {
+                            //Knowledge --
+                            Console.WriteLine("Lost");
+                            updateBrain(grid, move, badBoy);
+                            losses += 1;
+                            break;
+                        }
+
+
+                    }
+                    if (brainTrainingEngine.IsDraw())
+                    {
+                        //small reward for atleaset trying :)
+                        updateBrain(grid, move, mediocreMove);
+                        Console.WriteLine("Draw");
+                        draws += 1;
+                        break;
+                    }
+                    playerTurn = brainTrainingEngine.ChangePlayer(playerTurn);
                 }
 
+                Console.WriteLine(playerTurn);
+                Console.WriteLine("Studies complete");
+                Console.Write("Wins: " + wins + ", Losses: " + losses + ", Draws: " + draws + "  ");
             }
-            Console.WriteLine("Studies complete");
-            Console.Write("Wins: " + wins + ", Losses: " + losses);
         }
     }
 }
