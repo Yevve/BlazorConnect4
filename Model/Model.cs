@@ -114,13 +114,27 @@ namespace BlazorConnect4.Model
             }
             else if (playAgainst == "Q2")
             {
-                ai = new RandomAI();
-                ai.ToFile("Data/Q2.bin");
+                if (File.Exists("Data/Q2.bin"))
+                {
+                    ai = QAgent.ConstructFromFile("Data/Q2.bin");
+                }
+                else
+                {
+                    ai = new QAgent(Player);
+                    ai.ToFile("Data/Q2.bin");
+                }
             }
             else if (playAgainst == "Q3")
             {
-                ai = new RandomAI();
-                ai.ToFile("Data/Q3.bin");
+                if (File.Exists("Data/Q3.bin"))
+                {
+                    ai = QAgent.ConstructFromFile("Data/Q3.bin");
+                }
+                else
+                {
+                    ai = new QAgent(Player);
+                    ai.ToFile("Data/Q3.bin");
+                }
             }
 
         }

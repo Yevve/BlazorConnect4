@@ -36,7 +36,7 @@ namespace BlazorConnect4.AIModels
         }
 
     }
-
+    
 
 
     [Serializable]
@@ -69,15 +69,15 @@ namespace BlazorConnect4.AIModels
         [NonSerialized] Random generator;
 
         //Piska eller morot
-        public float goodBoy = 1;
-        public float badBoy = -1;
+        public float goodBoy = 1F;
+        public float badBoy = -1F;
         public float invalidMove = -0.1F;
         public float AIScore = 0F;
-        public float numIOfRuns = 0;
-        private CellColor playerColor;
         private int numberOfReps = 0;
+        private CellColor playerColor;
+        
 
-        Dictionary<String, double[]> brainDict = new Dictionary<string, double[]>();
+        Dictionary<String, float[]> brainDict = new Dictionary<string, float[]>();
         
         public QAgent(CellColor playerColor)
         {
@@ -90,17 +90,7 @@ namespace BlazorConnect4.AIModels
             return temp;
         }
 
-        /*public override int SelectMove(Cell[,] grid)
-        {
-            float epsilon = 0.85F;
-
-            int move =  epsilionEvaluation(grid,epsilon);
-
-            return move;
-
-        }*/
-
-
+        
         /**
          * PARAM: Cell[,] grid
          * RETURN:int action
@@ -112,55 +102,56 @@ namespace BlazorConnect4.AIModels
             double epsilon = 0.85F;
             //Check if AI should do an epsilon move or a random move
             Random randomGen = new Random();
-            int randomAction = randomGen.Next(0, 7);
-            int action = epsilionEvaluation(grid, epsilon);
 
-            bool validMove = newGameEngine.IsValid(grid, action);
-
+            int randomAction1 = randomGen.Next(0, 7);
             //While there are no valid moves, make a random move and validate it
-            while (!validMove)
+            if (randomGen.NextDouble() < epsilon)
             {
-                action = randomAction;
-                validMove = newGameEngine.IsValid(grid, action);
-
-            }
-            return action;
-        }
-
-        /**
-         * PARAM: Cell[,] grid, double epsilon
-         * RETURN: int currentMove
-         * 
-         * Function to evaluate epsilon to make a decision if the AI should make
-         * a random move or a calculated one.
-         */
-        public int epsilionEvaluation(Cell[,] grid, double epsilon)
-        {
-            Random randomValue = new Random();
-
-            if (randomValue.NextDouble() < epsilon)
-            {
-                // make a random move.
-                int currentMove = randomValue.Next(7);
-                while(!newGameEngine.IsValid(grid, currentMove))
+                int randomAction = randomGen.Next(0, 7);
+                while (!newGameEngine.IsValid(grid, randomAction))
                 {
-                    // repeat random move so it is not outside the grid.
-                    currentMove = randomValue.Next(7);
+                    randomAction = randomGen.Next(0, 7);
                 }
-                return currentMove;
+                return randomAction;
             }
             else
             {
-                // search in brainDict for old moves that were best in this grid varient.
+                int column = 0;
+                double previusColumnValue = searchInBrain(grid, column);
+
+                for (int i = 1; i < 7; i++)
+                {
+                    double nextColumnValue = searchInBrain(grid, i);
+                    if (previusColumnValue < nextColumnValue)
+                    {
+                        column = i;
+                        previusColumnValue = nextColumnValue;
+                    }
+
+                }
+                return column;
+            }
+            
+        }
+        // go through the meamory and search for the right column to put down the piece 
+        public double searchInBrain(Cell[,] grid, int column)
+        {
+            Random random = new Random();
+            float[] randomMove ={};
+            String gridString = GameBoard.GridToString(grid);
+            if (!brainDict.ContainsKey(gridString)){
+                for(int i = 0;i < 7; i++)
+                {
+                    // get outside the index of array 
+                    randomMove[i] += random.Next(7);
+                }
+                brainDict.Add(gridString, randomMove);
+                return randomMove[0];
+                Console.WriteLine(randomMove);
             }
 
-            return 0;
+            return brainDict[gridString][column];
         }
-
-        public bool isValid(int col, Cell[,] grid)
-        {
-            bool isValid = grid[col, 0].Color == CellColor.Blank;
-            return isValid;
-        }
+        
     }
 }
