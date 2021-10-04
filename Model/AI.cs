@@ -72,6 +72,7 @@ namespace BlazorConnect4.AIModels
         public float goodBoy = 1F;
         public float badBoy = -1F;
         public float invalidMove = -0.1F;
+        public float mediocreMove = 0.1F;
         public float AIScore = 0F;
         private int numberOfReps = 0;
 
@@ -147,6 +148,19 @@ namespace BlazorConnect4.AIModels
 
             return brainDict[gridString][column];
         }
+        public void updateBrain(Cell[,] grid, int column, float reward)
+        {
+            Random random = new Random();
+
+            String gridString = GameBoard.GridToString(grid);
+            if (!brainDict.ContainsKey(gridString))
+            {
+
+                double[] randomMove = { random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble(), random.NextDouble() };
+                brainDict.Add(gridString, randomMove);
+            }
+            brainDict[gridString][column] = reward;
+        }
        public void brainTrainingCamp(QAgent agent, int iterations)
         {
             newGameEngine brainTrainingEngine = new newGameEngine();
@@ -172,7 +186,8 @@ namespace BlazorConnect4.AIModels
             {
                 if(playerTurn == player)
                 {
-                    //TODO: Update memory
+                    //Invalid move
+                    updateBrain(grid, move, invalidMove);
                 }
                 
             }
@@ -180,19 +195,18 @@ namespace BlazorConnect4.AIModels
 
             if (brainTrainingEngine.IsWin(move, playerTurn))
             {
-                //TODO: Update memory
                 //Knowledge ++
-                Console.WriteLine("Win");
+                updateBrain(grid, move, goodBoy);
             }
             else
             {
-                //TODO: Update memory
                 //Knowledge --
-                Console.WriteLine("Lose");
+                updateBrain(grid, move, badBoy);
             }
             if (brainTrainingEngine.IsDraw())
             {
-                //Break
+                //small reward for atleaset trying :)
+                updateBrain(grid, move, mediocreMove);
                 Console.WriteLine("Draw");
             }
             
