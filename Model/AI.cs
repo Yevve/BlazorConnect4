@@ -102,11 +102,17 @@ namespace BlazorConnect4.AIModels
         public override int SelectMove(Cell[,] grid)
         {
             //Need to have a better epsilon value 
-            double epsilon = Math.Pow(0.7F,losses);
+            double epsilon =  Math.Pow(0.85F,wins);
+            int move = epsilonCalc(grid, epsilon);
             //Check if AI should do an epsilon move or a random move
+            return move;
+
+        }
+        public int epsilonCalc(Cell[,] grid,double epsilon)
+        {
             Random randomGen = new Random();
 
-            int randomAction1 = randomGen.Next(0, 7);
+            
             //While there are no valid moves, make a random move and validate it
             if (randomGen.NextDouble() < epsilon)
             {
@@ -134,7 +140,6 @@ namespace BlazorConnect4.AIModels
                 }
                 return column;
             }
-
         }
         // go through the brain and search for the right column to put down the piece.
         public double searchInBrain(Cell[,] grid, int column)
@@ -235,7 +240,7 @@ namespace BlazorConnect4.AIModels
                         break;
                     }
                     double currentGridState = searchInBrain(grid, move);
-                    int updatedQValue = SelectMove(grid);
+                    int updatedQValue = epsilonCalc(grid,3);
                     double nextMove = searchInBrain(grid, updatedQValue);
                     updateBrain(grid, move, currentGridState + alpha * (gamma * nextMove - currentGridState));
                     playerTurn = brainTrainingEngine.ChangePlayer(playerTurn);
