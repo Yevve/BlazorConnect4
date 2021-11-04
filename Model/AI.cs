@@ -69,11 +69,11 @@ namespace BlazorConnect4.AIModels
 
         private CellColor playerColor;
         //Piska eller morot
-        public float goodBoy = 1F;
-        public float badBoy = -1F;
-        public float invalidMove = -0.1F;
-        public float mediocreMove = 0.1F;
-        public float AIScore = 0F;
+        public double goodBoy = 1F;
+        public double badBoy = -1F;
+        public double invalidMove = -0.1F;
+        public double mediocreMove = 0.1F;
+        public double AIScore = 0F;
         private int numberOfReps = 0;
         public int wins;
         public int losses;
@@ -101,8 +101,8 @@ namespace BlazorConnect4.AIModels
          */
         public override int SelectMove(Cell[,] grid)
         {
-            //Maybe use a seed?
-            double epsilon = 0.85F;
+            //Need to have a better epsilon value 
+            double epsilon = Math.Pow(0.7F,losses);
             //Check if AI should do an epsilon move or a random move
             Random randomGen = new Random();
 
@@ -153,7 +153,7 @@ namespace BlazorConnect4.AIModels
             return brainDict[gridString][column];
         }
         // add rewards to brain
-        public void updateBrain(Cell[,] grid, int column, float reward)
+        public void updateBrain(Cell[,] grid, int column, double reward)
         {
             Random random = new Random();
 
@@ -168,6 +168,8 @@ namespace BlazorConnect4.AIModels
         }
         public void brainTrainingCamp(QAgent agent, int iterations)
         {
+            double alpha = 0.85F;
+            double gamma = 0.6F;
             newGameEngine brainTrainingEngine = new newGameEngine();
             for (int i = 0; i < iterations; i += 1)
             {
@@ -178,7 +180,7 @@ namespace BlazorConnect4.AIModels
                 CellColor playerTurn = CellColor.Red;
                 int move;
                 int previousMove;
-
+                numberOfReps = i;
                 while (i < iterations)
                 {
                     if (playerTurn == player)
@@ -227,16 +229,21 @@ namespace BlazorConnect4.AIModels
                     if (brainTrainingEngine.IsDraw())
                     {
                         //small reward for atleaset trying :)
-                        updateBrain(grid, move, mediocreMove);
+                        // removed draw reward
                         Console.WriteLine("Draw");
                         draws += 1;
                         break;
                     }
+                    double currentGridState = searchInBrain(grid, move);
+                    int updatedQValue = SelectMove(grid);
+                    double nextMove = searchInBrain(grid, updatedQValue);
+                    updateBrain(grid, move, currentGridState + alpha * (gamma * nextMove - currentGridState));
                     playerTurn = brainTrainingEngine.ChangePlayer(playerTurn);
                 }
 
                 Console.WriteLine(playerTurn);
                 Console.WriteLine("Studies complete");
+                Console.WriteLine(numberOfReps);
                 Console.Write("Wins: " + wins + ", Losses: " + losses + ", Draws: " + draws + "  ");
             }
         }
